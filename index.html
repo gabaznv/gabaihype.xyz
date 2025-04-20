@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,12 +6,6 @@
         body {
             margin: 0;
             overflow: hidden;
-            background: black;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
             font-family: monospace;
             color: white;
         }
@@ -19,327 +14,182 @@
             position: fixed;
             top: 0;
             left: 0;
-            z-index: -1;
+        }
+
+        .ui-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 1;
         }
 
         .title {
             font-size: 3rem;
-            margin-bottom: 2rem;
-            text-align: center;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            margin-bottom: 1rem;
             opacity: 0;
             animation: fadeIn 1s ease-out forwards;
         }
 
         .description {
             background: rgba(255, 255, 255, 0.1);
-            padding: 2rem;
+            padding: 1.5rem;
             border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
+            border-radius: 8px;
+            margin: 1rem auto;
             max-width: 500px;
-            margin: 1rem;
             opacity: 0;
-            animation: fadeIn 1s ease-out forwards;
+            animation: fadeIn 1s ease-out forwards 0.5s;
         }
 
         .buttons {
             display: flex;
             gap: 1rem;
+            justify-content: center;
             margin-top: 2rem;
             opacity: 0;
-            animation: fadeIn 1s ease-out forwards;
-        }
-
-        .title_des{
-            text-align: center;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-            opacity: 0;
-            animation: fadeIn 1s ease-out forwards;
-        }
-        
-        .reborn {
-            color:rgb(255, 139, 85)
+            animation: fadeIn 1s ease-out forwards 1s;
         }
 
         button {
             background: rgba(255, 255, 255, 0.1);
             border: 2px solid rgba(255, 255, 255, 0.3);
             color: white;
-            padding: 0.8rem 2rem;
+            padding: 0.8rem 1.5rem;
             border-radius: 5px;
             cursor: pointer;
-            font-family: monospace;
             transition: all 0.3s ease;
         }
 
         button:hover {
             background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
         }
 
-        #enterVR {
+        #vrButton {
             position: fixed;
             bottom: 20px;
             right: 20px;
-            background: rgba(0, 150, 255, 0.5);
-            border: 2px solid rgba(0, 200, 255, 0.8);
-        }
-
-        #enterVR:hover {
-            background: rgba(0, 150, 255, 0.8);
-        }
-
-        .vr-ui {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
-        }
-
-        .vr-content {
-            pointer-events: auto;
-            transform: translateZ(50px);
-            background: rgba(0, 0, 0, 0.7);
-            padding: 2rem;
-            border-radius: 10px;
-            max-width: 600px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 150, 255, 0.3);
         }
 
         @keyframes fadeIn {
-            from { 
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
-    <canvas id="starfield"></canvas>
+    <canvas id="mainCanvas"></canvas>
     
-    <!-- Normal UI Elements -->
-    <div id="normalUI">
+    <div class="ui-container">
         <h1 class="title">gabaihype</h1>
-        <p class="title_des">welcome to my site :]</p>
+        <p class="description">welcome to my site :]</p>
         
         <div class="description">
             <h2>About me</h2>
-            <p>hello i'm gabai<br>i think i have adhd<br>i'm currently learning python and html<br>the buttons don't work (im lazy to make them right now)</p>
-        </div>
-
-        <div class="description">
-            <h2>Projects</h2>
-            <p>for now i've only participated in the <a href="https://discord.gg/WE5gvEMtMC" class="reborn">r[eborn]</a> project</p>
+            <p>hello i'm gabai<br>learning python & web dev<br>ADHD creative chaos</p>
         </div>
 
         <div class="buttons">
-            <button>donate on ko-fi</button>
-            <button id="settingsBtn">settings</button>
-            <button>download template</button>
+            <button>Donate</button>
+            <button>Projects</button>
+            <button>Contact</button>
         </div>
     </div>
 
-    <!-- VR UI Elements -->
-    <div id="vrUI" class="vr-ui">
-        <div class="vr-content">
-            <h1 class="title">gabaihype</h1>
-            <p class="title_des">welcome to my site :]</p>
-            
-            <div class="description">
-                <h2>About me</h2>
-                <p>hello i'm gabai<br>i think i have adhd<br>i'm currently learning python and html<br>the buttons don't work (im lazy to make them right now)</p>
-            </div>
-
-            <div class="description">
-                <h2>Projects</h2>
-                <p>for now i've only participated in the <a href="https://discord.gg/WE5gvEMtMC" class="reborn">r[eborn]</a> project</p>
-            </div>
-
-            <div class="buttons">
-                <button>donate on ko-fi</button>
-                <button id="exitVRBtn">exit VR</button>
-                <button>download template</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- VR Toggle Button -->
-    <button id="enterVR">Enter VR</button>
+    <button id="vrButton" style="display: none;">Enter VR</button>
 
     <script>
-        const canvas = document.getElementById('starfield');
+        // Starfield Setup
+        const canvas = document.getElementById('mainCanvas');
         const ctx = canvas.getContext('2d');
-        const normalUI = document.getElementById('normalUI');
-        const vrUI = document.getElementById('vrUI');
-        const enterVRBtn = document.getElementById('enterVR');
-        const exitVRBtn = document.getElementById('exitVRBtn');
-        const settingsBtn = document.getElementById('settingsBtn');
 
-        // Starfield setup
-        function resizeCanvas() {
+        function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+        resize();
+        window.addEventListener('resize', resize);
 
-        const stars = [];
-        const numStars = 1000;
-        const maxSpeed = 1;
-        const starSize = 0.5;
-
-        class Star {
-            constructor() {
-                this.reset();
-            }
-
-            reset() {
-                this.x = (Math.random() - 0.5) * 2;
-                this.y = (Math.random() - 0.5) * 2;
-                this.z = Math.random() * 1500;
-                this.origZ = this.z;
-            }
-
-            update() {
-                this.z -= maxSpeed;
-                if (this.z <= 0) this.reset();
-            }
-
-            draw() {
-                const factor = 100 / this.z;
-                const x = this.x * factor * canvas.width + canvas.width/2;
-                const y = this.y * factor * canvas.height + canvas.height/2;
-                const size = (1 - this.z/this.origZ) * starSize * 2;
-                
-                ctx.beginPath();
-                ctx.arc(x, y, Math.max(size, 0.5), 0, 2 * Math.PI);
-                ctx.fillStyle = `rgba(255, 255, 255, ${1 - this.z/1500})`;
-                ctx.fill();
-            }
-        }
-
-        for (let i = 0; i < numStars; i++) {
-            stars.push(new Star());
-        }
+        const stars = Array.from({ length: 1000 }, () => ({
+            x: (Math.random() - 0.5) * 2,
+            y: (Math.random() - 0.5) * 2,
+            z: Math.random() * 1500
+        }));
 
         function animate() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             stars.forEach(star => {
-                star.update();
-                star.draw();
+                star.z -= 1;
+                if (star.z <= 0) star.z = 1500;
+                
+                const factor = 100 / star.z;
+                const x = star.x * factor * canvas.width + canvas.width/2;
+                const y = star.y * factor * canvas.height + canvas.height/2;
+                const size = (1 - star.z/1500) * 1;
+
+                ctx.beginPath();
+                ctx.arc(x, y, Math.max(size, 0.5), 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${1 - star.z/1500})`;
+                ctx.fill();
             });
 
             requestAnimationFrame(animate);
         }
-
         animate();
 
-        // WebXR VR Setup
-        let xrSession = null;
+        // Simplified WebXR Setup
+        if ('xr' in navigator) {
+            const vrButton = document.getElementById('vrButton');
+            vrButton.style.display = 'block';
 
-        async function onEnterVR() {
-            if (!navigator.xr) {
-                alert('WebXR not supported in your browser');
-                return;
-            }
+            let xrSession = null;
 
-            try {
-                // Request a VR session
-                xrSession = await navigator.xr.requestSession('immersive-vr');
-                
-                // Hide normal UI, show VR UI
-                normalUI.style.display = 'none';
-                vrUI.style.display = 'flex';
-                enterVRBtn.style.display = 'none';
-                
-                // Set up WebXR rendering
-                setupWebXR();
-                
-                // Handle session end
-                xrSession.addEventListener('end', onExitVR);
-            } catch (error) {
-                console.error('Error starting VR session:', error);
-            }
-        }
-
-        function onExitVR() {
-            if (xrSession) {
-                xrSession.end();
-            }
-            
-            // Show normal UI, hide VR UI
-            normalUI.style.display = 'block';
-            vrUI.style.display = 'none';
-            enterVRBtn.style.display = 'block';
-            
-            xrSession = null;
-        }
-
-        function setupWebXR() {
-            if (!xrSession) return;
-            
-            // Create a WebGL layer for the XR session
-            const gl = canvas.getContext('webgl', { xrCompatible: true });
-            const xrLayer = new XRWebGLLayer(xrSession, gl);
-            
-            // Update the session's base layer
-            xrSession.updateRenderState({ baseLayer: xrLayer });
-            
-            // Start the render loop
-            xrSession.requestAnimationFrame(onXRFrame);
-        }
-
-        function onXRFrame(time, xrFrame) {
-            if (!xrSession) return;
-            
-            const gl = canvas.getContext('webgl');
-            const pose = xrFrame.getViewerPose(xrSession.referenceSpace);
-            
-            if (pose) {
-                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-                
-                // Draw the starfield for each eye
-                for (const view of pose.views) {
-                    const viewport = xrSession.renderState.baseLayer.getViewport(view);
-                    gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
+            async function enterVR() {
+                try {
+                    xrSession = await navigator.xr.requestSession('immersive-vr');
                     
-                    // Draw your scene here (starfield)
-                    // You might want to adapt your starfield drawing for VR
-                    drawStarfieldForVR(gl, view);
+                    // Hide UI elements
+                    document.querySelector('.ui-container').style.display = 'none';
+                    vrButton.textContent = 'Exit VR';
+                    
+                    // Simple VR render loop
+                    const gl = canvas.getContext('webgl', { xrCompatible: true });
+                    const xrLayer = new XRWebGLLayer(xrSession, gl);
+                    
+                    xrSession.updateRenderState({ baseLayer: xrLayer });
+                    xrSession.requestAnimationFrame(onXRFrame);
+                    
+                } catch (error) {
+                    console.error('VR Error:', error);
                 }
             }
-            
-            xrSession.requestAnimationFrame(onXRFrame);
-        }
 
-        function drawStarfieldForVR(gl, view) {
-            // This would be your VR-adapted starfield drawing code
-            // For now we'll just clear with a color
-            gl.clearColor(0, 0, 0, 1);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-        }
+            function exitVR() {
+                if (xrSession) {
+                    xrSession.end();
+                    xrSession = null;
+                }
+                document.querySelector('.ui-container').style.display = 'block';
+                vrButton.textContent = 'Enter VR';
+            }
 
-        // Event listeners
-        enterVRBtn.addEventListener('click', onEnterVR);
-        exitVRBtn.addEventListener('click', onExitVR);
-        
-        // Only show VR button if WebXR is supported
-        if (navigator.xr) {
-            enterVRBtn.style.display = 'block';
-        } else {
-            enterVRBtn.style.display = 'none';
-            console.log('WebXR not supported');
+            function onXRFrame(time, frame) {
+                const gl = canvas.getContext('webgl');
+                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                gl.clear(gl.COLOR_BUFFER_BIT);
+                
+                // Add basic VR rendering here
+                
+                xrSession.requestAnimationFrame(onXRFrame);
+            }
+
+            vrButton.addEventListener('click', () => {
+                xrSession ? exitVR() : enterVR();
+            });
         }
     </script>
 </body>
