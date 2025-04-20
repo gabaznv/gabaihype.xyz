@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: black;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: monospace;
+            color: white;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .title {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .description {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            max-width: 500px;
+            margin: 1rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .title_des{
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+        
+        .reborn {
+            color:rgb(255, 139, 85)
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: monospace;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="starfield"></canvas>
+    
+    <!-- UI Elements -->
+    <h1 class="title">gabaihype</h1>
+    <p class="title_des">welcome to my site :]</p>
+    
+    <div class="description">
+        <h2>About me</h2>
+        <p>hello i'm gabai<br>i think i have adhd<br>i'm currently learning python and html<br>the buttons don't work (im lazy to make them right now)</p>
+    </div>
+
+    <div class="description">
+        <h2>Projects</h2>
+        <p>for now i've only participated in the <a href="https://discord.gg/WE5gvEMtMC" class="reborn">r[eborn]</a> project</p>
+    </div>
+
+    <div class="buttons">
+        <button>donate on ko-fi</button>
+        <button>settings</button>
+        <button>download template</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const stars = [];
+        const numStars = 1000;
+        const maxSpeed = 1;
+        const starSize = 0.5;
+
+        class Star {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = (Math.random() - 0.5) * 2;
+                this.y = (Math.random() - 0.5) * 2;
+                this.z = Math.random() * 1500;
+                this.origZ = this.z;
+            }
+
+            update() {
+                this.z -= maxSpeed;
+                if (this.z <= 0) this.reset();
+            }
+
+            draw() {
+                const factor = 100 / this.z;
+                const x = this.x * factor * canvas.width + canvas.width/2;
+                const y = this.y * factor * canvas.height + canvas.height/2;
+                const size = (1 - this.z/this.origZ) * starSize * 2;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, Math.max(size, 0.5), 0, 2 * Math.PI);
+                ctx.fillStyle = `rgba(255, 255, 255, ${1 - this.z/1500})`;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < numStars; i++) {
+            stars.push(new Star());
+        }
+
+        function animate() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            stars.forEach(star => {
+                star.update();
+                star.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
