@@ -77,6 +77,39 @@
             transform: scale(1.05);
         }
 
+        #enterVR {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 150, 255, 0.5);
+            border: 2px solid rgba(0, 200, 255, 0.8);
+        }
+
+        #enterVR:hover {
+            background: rgba(0, 150, 255, 0.8);
+        }
+
+        .vr-ui {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        .vr-content {
+            pointer-events: auto;
+            transform: translateZ(50px);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 600px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
         @keyframes fadeIn {
             from { 
                 opacity: 0;
@@ -92,30 +125,65 @@
 <body>
     <canvas id="starfield"></canvas>
     
-    <!-- UI Elements -->
-    <h1 class="title">gabaihype</h1>
-    <p class="title_des">welcome to my site :]</p>
-    
-    <div class="description">
-        <h2>About me</h2>
-        <p>hello i'm gabai<br>i think i have adhd<br>i'm currently learning python and html<br>the buttons don't work (im lazy to make them right now)</p>
+    <!-- Normal UI Elements -->
+    <div id="normalUI">
+        <h1 class="title">gabaihype</h1>
+        <p class="title_des">welcome to my site :]</p>
+        
+        <div class="description">
+            <h2>About me</h2>
+            <p>hello i'm gabai<br>i think i have adhd<br>i'm currently learning python and html<br>the buttons don't work (im lazy to make them right now)</p>
+        </div>
+
+        <div class="description">
+            <h2>Projects</h2>
+            <p>for now i've only participated in the <a href="https://discord.gg/WE5gvEMtMC" class="reborn">r[eborn]</a> project</p>
+        </div>
+
+        <div class="buttons">
+            <button>donate on ko-fi</button>
+            <button id="settingsBtn">settings</button>
+            <button>download template</button>
+        </div>
     </div>
 
-    <div class="description">
-        <h2>Projects</h2>
-        <p>for now i've only participated in the <a href="https://discord.gg/WE5gvEMtMC" class="reborn">r[eborn]</a> project</p>
+    <!-- VR UI Elements -->
+    <div id="vrUI" class="vr-ui">
+        <div class="vr-content">
+            <h1 class="title">gabaihype</h1>
+            <p class="title_des">welcome to my site :]</p>
+            
+            <div class="description">
+                <h2>About me</h2>
+                <p>hello i'm gabai<br>i think i have adhd<br>i'm currently learning python and html<br>the buttons don't work (im lazy to make them right now)</p>
+            </div>
+
+            <div class="description">
+                <h2>Projects</h2>
+                <p>for now i've only participated in the <a href="https://discord.gg/WE5gvEMtMC" class="reborn">r[eborn]</a> project</p>
+            </div>
+
+            <div class="buttons">
+                <button>donate on ko-fi</button>
+                <button id="exitVRBtn">exit VR</button>
+                <button>download template</button>
+            </div>
+        </div>
     </div>
 
-    <div class="buttons">
-        <button>donate on ko-fi</button>
-        <button>settings</button>
-        <button>download template</button>
-    </div>
+    <!-- VR Toggle Button -->
+    <button id="enterVR">Enter VR</button>
 
     <script>
         const canvas = document.getElementById('starfield');
         const ctx = canvas.getContext('2d');
+        const normalUI = document.getElementById('normalUI');
+        const vrUI = document.getElementById('vrUI');
+        const enterVRBtn = document.getElementById('enterVR');
+        const exitVRBtn = document.getElementById('exitVRBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
 
+        // Starfield setup
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -175,6 +243,104 @@
         }
 
         animate();
+
+        // WebXR VR Setup
+        let xrSession = null;
+
+        async function onEnterVR() {
+            if (!navigator.xr) {
+                alert('WebXR not supported in your browser');
+                return;
+            }
+
+            try {
+                // Request a VR session
+                xrSession = await navigator.xr.requestSession('immersive-vr');
+                
+                // Hide normal UI, show VR UI
+                normalUI.style.display = 'none';
+                vrUI.style.display = 'flex';
+                enterVRBtn.style.display = 'none';
+                
+                // Set up WebXR rendering
+                setupWebXR();
+                
+                // Handle session end
+                xrSession.addEventListener('end', onExitVR);
+            } catch (error) {
+                console.error('Error starting VR session:', error);
+            }
+        }
+
+        function onExitVR() {
+            if (xrSession) {
+                xrSession.end();
+            }
+            
+            // Show normal UI, hide VR UI
+            normalUI.style.display = 'block';
+            vrUI.style.display = 'none';
+            enterVRBtn.style.display = 'block';
+            
+            xrSession = null;
+        }
+
+        function setupWebXR() {
+            if (!xrSession) return;
+            
+            // Create a WebGL layer for the XR session
+            const gl = canvas.getContext('webgl', { xrCompatible: true });
+            const xrLayer = new XRWebGLLayer(xrSession, gl);
+            
+            // Update the session's base layer
+            xrSession.updateRenderState({ baseLayer: xrLayer });
+            
+            // Start the render loop
+            xrSession.requestAnimationFrame(onXRFrame);
+        }
+
+        function onXRFrame(time, xrFrame) {
+            if (!xrSession) return;
+            
+            const gl = canvas.getContext('webgl');
+            const pose = xrFrame.getViewerPose(xrSession.referenceSpace);
+            
+            if (pose) {
+                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+                
+                // Draw the starfield for each eye
+                for (const view of pose.views) {
+                    const viewport = xrSession.renderState.baseLayer.getViewport(view);
+                    gl.viewport(viewport.x, viewport.y, viewport.width, viewport.height);
+                    
+                    // Draw your scene here (starfield)
+                    // You might want to adapt your starfield drawing for VR
+                    drawStarfieldForVR(gl, view);
+                }
+            }
+            
+            xrSession.requestAnimationFrame(onXRFrame);
+        }
+
+        function drawStarfieldForVR(gl, view) {
+            // This would be your VR-adapted starfield drawing code
+            // For now we'll just clear with a color
+            gl.clearColor(0, 0, 0, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+        }
+
+        // Event listeners
+        enterVRBtn.addEventListener('click', onEnterVR);
+        exitVRBtn.addEventListener('click', onExitVR);
+        
+        // Only show VR button if WebXR is supported
+        if (navigator.xr) {
+            enterVRBtn.style.display = 'block';
+        } else {
+            enterVRBtn.style.display = 'none';
+            console.log('WebXR not supported');
+        }
     </script>
 </body>
 </html>
