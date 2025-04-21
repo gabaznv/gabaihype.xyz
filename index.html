@@ -1,196 +1,33 @@
-
 <!DOCTYPE html>
 <html>
 <head>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            font-family: monospace;
-            color: white;
-        }
-
-        canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-        }
-
-        .ui-container {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 1;
-        }
-
-        .title {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0;
-            animation: fadeIn 1s ease-out forwards;
-        }
-
-        .description {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 1.5rem;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-            margin: 1rem auto;
-            max-width: 500px;
-            opacity: 0;
-            animation: fadeIn 1s ease-out forwards 0.5s;
-        }
-
-        .buttons {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            margin-top: 2rem;
-            opacity: 0;
-            animation: fadeIn 1s ease-out forwards 1s;
-        }
-
-        button {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        button:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        #vrButton {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(0, 150, 255, 0.3);
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+    <title>gabaihype</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <canvas id="mainCanvas"></canvas>
+    <canvas id="starfield"></canvas>
     
-    <div class="ui-container">
-        <h1 class="title">gabaihype</h1>
-        <p class="description">welcome to my site :]</p>
-        
-        <div class="description">
-            <h2>About me</h2>
-            <p>hello i'm gabai<br>learning python & web dev<br>ADHD creative chaos</p>
-        </div>
-
-        <div class="buttons">
-            <button>Donate</button>
-            <button>Projects</button>
-            <button>Contact</button>
-        </div>
+    <!-- UI Elements -->
+    <h1 class="title">gabaihype</h1>
+    <p class="title_des">welcome to my site :]</p>
+    
+    <div class="description">
+        <h2>About me</h2>
+        <p>hello i'm gabai<br>i think i have adhd<br>I'm experienced in HTML, CSS, JS, Python and a little bit of c++</p>
     </div>
 
-    <button id="vrButton" style="display: none;">Enter VR</button>
+    <div class="description">
+        <h2>Projects</h2>
+        <p>for now i've only participated in the <a href="https://discord.gg/WE5gvEMtMC" class="reborn">r[eborn]</a> project<br>i've also done some other projects on github<br>you can check all of my sites <a class="reborn" href="projects.html">here</a></p>
+    </div>
 
-    <script>
-        // Starfield Setup
-        const canvas = document.getElementById('mainCanvas');
-        const ctx = canvas.getContext('2d');
+    <div class="buttons">
+        <a href="https://youtube.com"><button>youtube</button></a>
+        <a href="https://www.Ko-fi.com/gabaihype"><button>donate on ko-fi</button></a>
+        <a href="https://www.tiktok.com/@gabaihype"><button>tiktok</button></a>
+    </div>
 
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        resize();
-        window.addEventListener('resize', resize);
-
-        const stars = Array.from({ length: 1000 }, () => ({
-            x: (Math.random() - 0.5) * 2,
-            y: (Math.random() - 0.5) * 2,
-            z: Math.random() * 1500
-        }));
-
-        function animate() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            stars.forEach(star => {
-                star.z -= 1;
-                if (star.z <= 0) star.z = 1500;
-                
-                const factor = 100 / star.z;
-                const x = star.x * factor * canvas.width + canvas.width/2;
-                const y = star.y * factor * canvas.height + canvas.height/2;
-                const size = (1 - star.z/1500) * 1;
-
-                ctx.beginPath();
-                ctx.arc(x, y, Math.max(size, 0.5), 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${1 - star.z/1500})`;
-                ctx.fill();
-            });
-
-            requestAnimationFrame(animate);
-        }
-        animate();
-
-        // Simplified WebXR Setup
-        if ('xr' in navigator) {
-            const vrButton = document.getElementById('vrButton');
-            vrButton.style.display = 'block';
-
-            let xrSession = null;
-
-            async function enterVR() {
-                try {
-                    xrSession = await navigator.xr.requestSession('immersive-vr');
-                    
-                    // Hide UI elements
-                    document.querySelector('.ui-container').style.display = 'none';
-                    vrButton.textContent = 'Exit VR';
-                    
-                    // Simple VR render loop
-                    const gl = canvas.getContext('webgl', { xrCompatible: true });
-                    const xrLayer = new XRWebGLLayer(xrSession, gl);
-                    
-                    xrSession.updateRenderState({ baseLayer: xrLayer });
-                    xrSession.requestAnimationFrame(onXRFrame);
-                    
-                } catch (error) {
-                    console.error('VR Error:', error);
-                }
-            }
-
-            function exitVR() {
-                if (xrSession) {
-                    xrSession.end();
-                    xrSession = null;
-                }
-                document.querySelector('.ui-container').style.display = 'block';
-                vrButton.textContent = 'Enter VR';
-            }
-
-            function onXRFrame(time, frame) {
-                const gl = canvas.getContext('webgl');
-                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-                gl.clear(gl.COLOR_BUFFER_BIT);
-                
-                // Add basic VR rendering here
-                
-                xrSession.requestAnimationFrame(onXRFrame);
-            }
-
-            vrButton.addEventListener('click', () => {
-                xrSession ? exitVR() : enterVR();
-            });
-        }
+    <script src="script.js">
     </script>
 </body>
 </html>
